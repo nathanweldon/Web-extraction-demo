@@ -10,14 +10,23 @@ editor: visual
 
 In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization.
 
+```{r}
+pacman::p_load(
+  tidyverse,
+  fivethirtyeight,
+  rvest,
+  httr,
+  janitor
+)
+
+```
+
 ## Movie Data
 
 538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](is%20a%20website%20that%20focuses%20on%20opinion%20poll%20analysis,%20politics,%20economics,%20and%20sports%20blogging.%20It%20was%20created%20and%20is%20currently%20run%20by%20Nate%20Silver,%20who%20has%20become%20famous%20for%20his%20writing%20and%20work%20on%20the%20site.) about how fandango has unnecessary rounded ratings when rating movies. Below is the recreation of that plot and more conclusions.
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
-install.packages("fivethirtyeight")
-library("tidyverse")
-library("fivethirtyeight")
+# install.packages("fivethirtyeight")
 fandango_rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_scrape.csv') 
 rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
 
@@ -49,13 +58,11 @@ count_fandango <- count(fandango, Fandango_Stars)
 count_other <- count(tmp, other_avg)
 
 df <- merge(count_fandango, count_other,
-            by = "n",
-            all = TRUE)
+            by = "n") %>% 
+  mutate(fan = count())
 df[is.na(df)] <- 0
-
   
-plot <- df %>% 
-  ggplot(aes(Fandango_Stars, n)) +
+plot <- ggplot(count_other, aes(other_avg, n)) +
   geom_line(color = 'red') +
   geom_area(fill = 'tomato', alpha = .5) +
   scale_x_continuous(limits = c(0,5.1), 
@@ -72,7 +79,7 @@ plot <- df %>%
   theme(plot.title = element_text(size = 20, face = 'bold', color = 'grey20')) +
   theme(plot.subtitle = element_text(size = 13, color = 'grey25'))
 
-
+plot
 ```
 
 ### Conclusion
@@ -81,6 +88,48 @@ plot <- df %>%
 
 Description
 
-```{r}
-#code
+```{r warning = FALSE}
+ds <-read_html('https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States') %>%
+  html_elements('table.sortable') %>%
+  html_table()
+
+table <- ds[[2]] %>%
+  drop_na() %>%
+  clean_names() %>%
+  pivot_longer(!year, names_to = 'Age', values_to ='Median_income') %>%
+  mutate(Median_income = str_sub(Median_income, start = 2)) %>%
+  filter(Median_income %>% str_detect(",")) %>%
+  slice(-c(159:176))
+
+tablescrub2 <- tablescrub$Age %>%
+  str_replace_all('_',' ') %>%
+  str_to_title() %>%
+  fct_relevel(c("Less Than 9th Grade",
+                "High School Drop Out",
+                "High School Graduate",
+                "Some College",
+                "Associate Degree",
+                "Bachelors Degree",
+                "Bachelors Degree Or More",
+                "Masters Degree",
+                "Doctorate Degree",
+                "Professional Degree",
+                "Overall Median"))
+
+tablescrub3 <- tablescrub$Median_income %>%
+  str_remove(',') %>%
+  as.numeric(tablescrub$Median_income)
+
+thetable<- tablescrub %>%
+  mutate(Level = tablescrub2) %>%
+  mutate(Income = tablescrub3) %>%
+  select(1,4,5)
+
+plot <- ggplot(data = thetable, mapping = aes(x = year, y = Income, color = Level, group = Level)) +
+  geom_line() +
+  labs(x = 'Year',
+       y = 'Median Income') +
+  scale_y_continuous(limits = c(20000,160000)) +
+  theme_bw()
+theplot
 ```
