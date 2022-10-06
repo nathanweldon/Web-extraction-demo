@@ -12,32 +12,50 @@ In this project, I will work with online sources to recreate already produced da
 
 ## Movie Data
 
-538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site.) about how fandango has skewed results when rating movies. Below is the recreation of that plot and more conclusions.
+538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](is%20a%20website%20that%20focuses%20on%20opinion%20poll%20analysis,%20politics,%20economics,%20and%20sports%20blogging.%20It%20was%20created%20and%20is%20currently%20run%20by%20Nate%20Silver,%20who%20has%20become%20famous%20for%20his%20writing%20and%20work%20on%20the%20site.) about how fandango has unnecessary rounded ratings when rating movies. Below is the recreation of that plot and more conclusions.
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 install.packages("fivethirtyeight")
 library("tidyverse")
 library("fivethirtyeight")
 fandango_rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_scrape.csv') 
-rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') %>% 
-  select(
-    c(FILM, contains("norm"), -contains("user")))
+rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
 
 ```
 
 ```{r}
-avg_movie <- rating %>% 
+
+fandango <- rating %>%
   drop_na() %>% 
   filter(Fandango_votes > 30) %>% 
-  filter(FILM %>% str_detect('2015')) %>%
-  mutate(n == sum(c(2:6)) 
+  filter(FILM %>% str_detect('2015')) %>% 
+  select(c(FILM, Fandango_Stars)) 
+
+other <- rating %>% 
+  drop_na() %>% 
+  filter(Fandango_votes > 30) %>% 
+  filter(FILM %>% str_detect('2015')) %>% 
+  mutate(RT = round(RottenTomatoes / 20, digits = 1)) %>% 
+  mutate(Metacritic = round(Metacritic_norm, 1)) %>% 
+  mutate(IMDB = round(IMDB_norm, 1)) %>% 
+  select(c(FILM, RT, Metacritic, IMDB)) 
+
+
+
+tmp <- inner_join(fandango, other) %>% 
+  mutate(other_avg = round((RT + Metacritic + IMDB)/3, digits = 1))
+
+count_fandango <- count(fandango, Fandango_Stars) 
+count_other <- count(tmp, other_avg)
+
+df <- merge(count_fandango, count_other,
+            by = "n",
+            all = TRUE)
+df[is.na(df)] <- 0
+
   
-df <- fandango_rating %>%
-  drop_na() %>%
-  filter(VOTES > 30) %>%
-  filter(FILM %>% str_detect('2015')) %>%
-  count(STARS) %>% 
-  ggplot(aes(STARS, n)) +
+plot <- df %>% 
+  ggplot(aes(Fandango_Stars, n)) +
   geom_line(color = 'red') +
   geom_area(fill = 'tomato', alpha = .5) +
   scale_x_continuous(limits = c(0,5.1), 
@@ -45,8 +63,8 @@ df <- fandango_rating %>%
   scale_y_continuous(limits = c(0,90), 
                      labels = scales::percent_format(scale = .5, 
                                                      accuracy = 10)) +
-  labs(title = "Fandango's Lopsided Ratings Curve",
-       subtitle = "Ratings for 209 films that played in theaters in 2015 and received 30+ reviews",
+  labs(title = "Fandango.com's Ratings Are Inflated By Rounding",
+       subtitle = "Ratings distribution of 209 films that played in theaters in 2015 and received 30+ reviews",
        y = " ",
        x = " ") +
   theme(panel.background = element_rect(fill = '#F5F5F5')) +
