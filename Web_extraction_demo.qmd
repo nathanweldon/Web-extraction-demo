@@ -1,0 +1,27 @@
+---
+title: "Web Extraction"
+format: html
+author: "Nathan Weldon"
+date: as.date()
+editor: visual
+---
+
+## Introduction
+
+Enter background.
+
+## HTML
+
+Description
+
+```{r}
+# code
+```
+
+## Movie Data
+
+Description
+
+```{r}
+#code
+```
