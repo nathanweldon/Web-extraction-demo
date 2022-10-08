@@ -27,19 +27,26 @@ pacman::p_load(
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 # install.packages("fivethirtyeight")
-fandango_rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_scrape.csv') 
 rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
 
 ```
 
-```{r}
-
+```{r include = FALSE}
+#Finding Fandango Stars
 fandango <- rating %>%
   drop_na() %>% 
   filter(Fandango_votes > 30) %>% 
   filter(FILM %>% str_detect('2015')) %>% 
   select(c(FILM, Fandango_Stars)) 
 
+count_fandango <- count(fandango, Fandango_Stars)
+
+tibble <- tibble(Fandango_Stars = seq(0,2.5, .5),
+                 n = 0)
+
+fandango_data <- rbind(tibble, count_fandango)
+
+#Finding Other Stars
 other <- rating %>% 
   drop_na() %>% 
   filter(Fandango_votes > 30) %>% 
@@ -49,22 +56,45 @@ other <- rating %>%
   mutate(IMDB = round(IMDB_norm, 1)) %>% 
   select(c(FILM, RT, Metacritic, IMDB)) 
 
+#Rotten Tomatoes
+count_rt <- count(other, RT)
 
+rt_tibble <- tibble(RT = seq(0,.1,.1),
+                    n = 0)
+rt_data <- rbind(rt_tibble, count_rt)
 
-tmp <- inner_join(fandango, other) %>% 
-  mutate(other_avg = round((RT + Metacritic + IMDB)/3, digits = 1))
+#Metacritic
+count_mc <- count(other, Metacritic) %>% 
+  slice(-c(1))
 
-count_fandango <- count(fandango, Fandango_Stars) 
-count_other <- count(tmp, other_avg)
+mc_tibble1 <- tibble(Metacritic = seq(4.8,5,.1),
+                     n = 0)
+mc_tibble <- tibble(Metacritic = seq(0,1,.1),
+                     n = 0)
+mc_data1 <- rbind(count_mc, mc_tibble1)
+mc_data <- rbind(mc_tibble, mc_data1)
 
-df <- merge(count_fandango, count_other,
-            by = "n") %>% 
-  mutate(fan = count())
-df[is.na(df)] <- 0
-  
-plot <- ggplot(count_other, aes(other_avg, n)) +
+#IMDB
+count_imdb <- count(other, IMDB)
+
+imdb_tibble2 <- tibble(IMDB = seq(0,1.9,.1),
+                       n = 0)
+imdb_tibble1 <- tibble(IMDB = 2.4,
+                       n = 0)
+imdb_tibble <- tibble(IMDB = seq(4.4,5,.1),
+                     n = 0) 
+
+imdb_data2 <- rbind(count_imdb, imdb_tibble2)
+imdb_data1 <- rbind(imdb_data2,imdb_tibble1)
+imdb_data <- rbind(imdb_data1, imdb_tibble) 
+```
+
+```{r}
+#Plot
+plot <- ggplot(data = fandango_data, aes(Fandango_Stars, n)) +
   geom_line(color = 'red') +
   geom_area(fill = 'tomato', alpha = .5) +
+  geom_line(data = mc_data, aes()) +
   scale_x_continuous(limits = c(0,5.1), 
                      breaks = seq(0,5,1)) +
   scale_y_continuous(limits = c(0,90), 
