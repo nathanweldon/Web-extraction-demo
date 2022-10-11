@@ -23,7 +23,7 @@ pacman::p_load(
 
 ## Movie Data
 
-538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has unnecessary rounded ratings when rating movies. Below is the recreation of that plot and more conclusions.
+538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions.
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 # install.packages("fivethirtyeight")
@@ -39,142 +39,66 @@ fandango <- rating %>%
   filter(FILM %>% str_detect('2015')) %>% 
   select(c(FILM, Fandango_Stars)) 
 
-count_fandango <- count(fandango, Fandango_Stars)
-
-tibble <- tibble(Fandango_Stars = seq(0,5, .5),
+fandango_count <- count(fandango, Fandango_Stars)
+fandango_tibble <- tibble(Fandango_Stars = seq(0,5, .5),
                  n = 0)
 
-fandango_data <- full_join(tibble, count_fandango)
+fandango_data <- full_join(fandango_tibble, fandango_count)
 
-fandango_plot <- ggplot(data = fandango_data, aes(x = Fandango_Stars, y = n)) +
+ggplot(data = fandango_data, aes(x = Fandango_Stars, y = n)) +
   geom_line(color = 'red') +
   geom_area(fill = 'tomato', alpha = .5)
 
-fandango_plot
 ```
 
 ```{r include = FALSE}
 
 #Finding Other Stars
-other <- rating %>% 
+other_critics <- rating %>% 
   drop_na() %>% 
   filter(Fandango_votes > 30) %>% 
   filter(FILM %>% str_detect('2015')) %>% 
-  mutate(RT = round(RT_norm, digits = 1)) %>%
-  mutate(RT_user = round(RT_user_norm, digits = 1)) %>% 
-  mutate(Metacritic = round(Metacritic_norm, 1)) %>%
-  mutate(Metacritic_user = round(Metacritic_user_nom, 1)) %>% 
-  mutate(IMDB_user = round(IMDB_norm, 1)) %>% 
-  select(c(FILM, RT, RT_user, Metacritic, Metacritic_user, IMDB_user)) 
+  select(c(FILM, contains("round")))
 
 #Rotten Tomatoes
-count_rt <- count(other, RT)
-
-rt_tibble <- tibble(RT = seq(0,5,.1),
-                    n = 0)
-rt_data <- full_join(rt_tibble, count_rt)
+rt_data <- count(other_critics, RT_norm_round)
 
 #RT User
-count_rt_user <- count(other, RT_user)
-rt_user_tibble <- tibble(RT = seq(0,5,.1),
+rt_user_count <- count(other_critics, RT_user_norm_round)
+rt_user_tibble <- tibble(RT_user_norm_round = seq(0.5,5,.5),
                          n = 0)
-rt_user_data <- full_join(rt_user_tibble, count_rt_user)
+rt_user_data <- full_join(rt_user_tibble, rt_user_count)
+
 #Metacritic
-count_mc <- count(other, Metacritic) %>% 
-  slice(-c(1))
+mc_data <- count(other_critics, Metacritic_norm_round)
 
-mc_tibble1 <- tibble(Metacritic = seq(4.8,5,.1),
-                     n = 0)
-mc_tibble <- tibble(Metacritic = seq(0,1,.1),
-                     n = 0)
-mc_data1 <- rbind(count_mc, mc_tibble1)
-mc_data <- rbind(mc_tibble, mc_data1)
+#MC User
+mc_user_count <- count(other_critics, Metacritic_user_norm_round)
+mc_user_tibble <- tibble(Metacritic_user_norm_round = .5,
+                         n = 0)
+mc_user_data <- full_join(mc_user_tibble, mc_user_count)
 
-#IMDB
-count_imdb <- count(other, IMDB)
+#IMDB user
+imdb_user_count <- count(other_critics, IMDB_norm_round)
+imdb_user_tibble <- tibble(IMDB_norm_round = 5,
+                         n = 0)
+imdb_user_data <- full_join(count_imdb_user, imdb_user_tibble) 
 
-imdb_tibble2 <- tibble(IMDB = seq(0,1.9,.1),
-                       n = 0)
-imdb_tibble1 <- tibble(IMDB = 2.4,
-                       n = 0)
-imdb_tibble <- tibble(IMDB = seq(4.4,5,.1),
-                     n = 0) 
 
-imdb_data2 <- rbind(count_imdb, imdb_tibble2)
-imdb_data1 <- rbind(imdb_data2,imdb_tibble1)
-imdb_data <- rbind(imdb_data1, imdb_tibble) 
 ```
 
 ```{r}
-#Plot
-plot <- ggplot(data = fandango_data, aes(Fandango_Stars, n)) +
-  geom_line(color = 'red') +
-  geom_area(fill = 'tomato', alpha = .5) +
-  scale_x_continuous(limits = c(0,5.1), 
-                     breaks = seq(0,5,1)) +
-  scale_y_continuous(limits = c(0,90), 
-                     labels = scales::percent_format(scale = .5, 
-                                                     accuracy = 10)) +
-  labs(title = "Fandango.com's Ratings Are Inflated By Rounding",
-       subtitle = "Ratings distribution of 209 films that played in theaters in 2015 and received 30+ reviews",
-       y = " ",
-       x = " ") +
-  theme(panel.background = element_rect(fill = '#F5F5F5')) +
-  theme(plot.background = element_rect(fill = '#F5F5F5')) +
-  theme(plot.title = element_text(size = 20, face = 'bold', color = 'grey20')) +
-  theme(plot.subtitle = element_text(size = 13, color = 'grey25'))
+#Testing
+fandango_count, rt_count, rt_user_count, mc_count, mc_user_count, imdb_user_count
 
-plot
 ```
 
 ### Conclusion
 
 ## HTML
 
-Description
+IGNORE THIS PART - TO COME
 
-```{r warning = FALSE}
-ds <-read_html('https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States') %>%
-  html_elements('table.sortable') %>%
-  html_table()
+```{r}
 
-table <- ds[[2]] %>%
-  drop_na() %>%
-  clean_names() %>%
-  pivot_longer(!year, names_to = 'Age', values_to ='Median_income') %>%
-  mutate(Median_income = str_sub(Median_income, start = 2)) %>%
-  filter(Median_income %>% str_detect(",")) %>%
-  slice(-c(159:176))
-
-tablescrub2 <- tablescrub$Age %>%
-  str_replace_all('_',' ') %>%
-  str_to_title() %>%
-  fct_relevel(c("Less Than 9th Grade",
-                "High School Drop Out",
-                "High School Graduate",
-                "Some College",
-                "Associate Degree",
-                "Bachelors Degree",
-                "Bachelors Degree Or More",
-                "Masters Degree",
-                "Doctorate Degree",
-                "Professional Degree",
-                "Overall Median"))
-
-tablescrub3 <- tablescrub$Median_income %>%
-  str_remove(',') %>%
-  as.numeric(tablescrub$Median_income)
-
-thetable<- tablescrub %>%
-  mutate(Level = tablescrub2) %>%
-  mutate(Income = tablescrub3) %>%
-  select(1,4,5)
-
-plot <- ggplot(data = thetable, mapping = aes(x = year, y = Income, color = Level, group = Level)) +
-  geom_line() +
-  labs(x = 'Year',
-       y = 'Median Income') +
-  scale_y_continuous(limits = c(20000,160000)) +
-  theme_bw()
-theplot
 ```
