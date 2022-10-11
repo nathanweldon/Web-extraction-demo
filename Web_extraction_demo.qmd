@@ -23,7 +23,7 @@ pacman::p_load(
 
 ## Movie Data
 
-538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](is%20a%20website%20that%20focuses%20on%20opinion%20poll%20analysis,%20politics,%20economics,%20and%20sports%20blogging.%20It%20was%20created%20and%20is%20currently%20run%20by%20Nate%20Silver,%20who%20has%20become%20famous%20for%20his%20writing%20and%20work%20on%20the%20site.) about how fandango has unnecessary rounded ratings when rating movies. Below is the recreation of that plot and more conclusions.
+538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has unnecessary rounded ratings when rating movies. Below is the recreation of that plot and more conclusions.
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 # install.packages("fivethirtyeight")
@@ -31,7 +31,7 @@ rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/maste
 
 ```
 
-```{r include = FALSE}
+```{r}
 #Finding Fandango Stars
 fandango <- rating %>%
   drop_na() %>% 
@@ -41,28 +41,44 @@ fandango <- rating %>%
 
 count_fandango <- count(fandango, Fandango_Stars)
 
-tibble <- tibble(Fandango_Stars = seq(0,2.5, .5),
+tibble <- tibble(Fandango_Stars = seq(0,5, .5),
                  n = 0)
 
-fandango_data <- rbind(tibble, count_fandango)
+fandango_data <- full_join(tibble, count_fandango)
+
+fandango_plot <- ggplot(data = fandango_data, aes(x = Fandango_Stars, y = n)) +
+  geom_line(color = 'red') +
+  geom_area(fill = 'tomato', alpha = .5)
+
+fandango_plot
+```
+
+```{r include = FALSE}
 
 #Finding Other Stars
 other <- rating %>% 
   drop_na() %>% 
   filter(Fandango_votes > 30) %>% 
   filter(FILM %>% str_detect('2015')) %>% 
-  mutate(RT = round(RottenTomatoes / 20, digits = 1)) %>% 
-  mutate(Metacritic = round(Metacritic_norm, 1)) %>% 
-  mutate(IMDB = round(IMDB_norm, 1)) %>% 
-  select(c(FILM, RT, Metacritic, IMDB)) 
+  mutate(RT = round(RT_norm, digits = 1)) %>%
+  mutate(RT_user = round(RT_user_norm, digits = 1)) %>% 
+  mutate(Metacritic = round(Metacritic_norm, 1)) %>%
+  mutate(Metacritic_user = round(Metacritic_user_nom, 1)) %>% 
+  mutate(IMDB_user = round(IMDB_norm, 1)) %>% 
+  select(c(FILM, RT, RT_user, Metacritic, Metacritic_user, IMDB_user)) 
 
 #Rotten Tomatoes
 count_rt <- count(other, RT)
 
-rt_tibble <- tibble(RT = seq(0,.1,.1),
+rt_tibble <- tibble(RT = seq(0,5,.1),
                     n = 0)
-rt_data <- rbind(rt_tibble, count_rt)
+rt_data <- full_join(rt_tibble, count_rt)
 
+#RT User
+count_rt_user <- count(other, RT_user)
+rt_user_tibble <- tibble(RT = seq(0,5,.1),
+                         n = 0)
+rt_user_data <- full_join(rt_user_tibble, count_rt_user)
 #Metacritic
 count_mc <- count(other, Metacritic) %>% 
   slice(-c(1))
@@ -94,7 +110,6 @@ imdb_data <- rbind(imdb_data1, imdb_tibble)
 plot <- ggplot(data = fandango_data, aes(Fandango_Stars, n)) +
   geom_line(color = 'red') +
   geom_area(fill = 'tomato', alpha = .5) +
-  geom_line(data = mc_data, aes()) +
   scale_x_continuous(limits = c(0,5.1), 
                      breaks = seq(0,5,1)) +
   scale_y_continuous(limits = c(0,90), 
