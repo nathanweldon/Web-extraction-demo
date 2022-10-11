@@ -156,6 +156,8 @@ My method was to take the ratings data set to calculate all of the rounded ratin
 
 The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate.
 
+Some issues I ran into was finding a way to put the gray fill color underneath all of the lines, as I could only maneuver my way to get one using geom_area(). Also, I could not find a package containing aesthetics for stars for the x axis: the graph on the page contains stars on the bottom of the graph but I did not find any in my research. Fortunately, my greatest issues were primarily in the aesthetics department and not so much in the technical area.
+
 ## HTML
 
 IGNORE THIS PART - TO COME
