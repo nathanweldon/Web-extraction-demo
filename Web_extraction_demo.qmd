@@ -31,7 +31,7 @@ rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/maste
 
 ```
 
-```{r}
+```{r include = FALSE}
 #Finding Fandango Stars
 fandango <- rating %>%
   drop_na() %>% 
@@ -40,18 +40,12 @@ fandango <- rating %>%
   select(c(FILM, Fandango_Stars)) 
 
 fandango_count <- count(fandango, Fandango_Stars)
-fandango_tibble <- tibble(Fandango_Stars = seq(0,5, .5),
-                 n = 0)
-
-fandango_data <- full_join(fandango_tibble, fandango_count)
-
-ggplot(data = fandango_data, aes(x = Fandango_Stars, y = n)) +
-  geom_line(color = 'red') +
-  geom_area(fill = 'tomato', alpha = .5)
-
-```
-
-```{r include = FALSE}
+fandango_data <- tibble(Fandango_Stars = seq(0,5, .5)) %>% 
+  full_join(fandango_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(Fandango_Stars, count)
 
 #Finding Other Stars
 other_critics <- rating %>% 
@@ -61,34 +55,54 @@ other_critics <- rating %>%
   select(c(FILM, contains("round")))
 
 #Rotten Tomatoes
-rt_data <- count(other_critics, RT_norm_round)
+rt_count <- count(other_critics, RT_norm_round)
+rt_data <- tibble(RT_norm_round = seq(0,5, .5)) %>% 
+  full_join(rt_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(RT_norm_round, count)
 
 #RT User
 rt_user_count <- count(other_critics, RT_user_norm_round)
-rt_user_tibble <- tibble(RT_user_norm_round = seq(0.5,5,.5),
-                         n = 0)
-rt_user_data <- full_join(rt_user_tibble, rt_user_count)
+rt_user_data <- tibble(RT_user_norm_round = seq(0,5, .5)) %>% 
+  full_join(rt_user_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(RT_user_norm_round, count)
 
 #Metacritic
-mc_data <- count(other_critics, Metacritic_norm_round)
+mc_count <- count(other_critics, Metacritic_norm_round)
+mc_data <- tibble(Metacritic_norm_round = seq(0,5, .5)) %>% 
+  full_join(mc_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(Metacritic_norm_round, count)
 
 #MC User
 mc_user_count <- count(other_critics, Metacritic_user_norm_round)
-mc_user_tibble <- tibble(Metacritic_user_norm_round = .5,
-                         n = 0)
-mc_user_data <- full_join(mc_user_tibble, mc_user_count)
+mc_user_data <- tibble(Metacritic_user_norm_round = seq(0,5, .5)) %>% 
+  full_join(mc_user_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(Metacritic_user_norm_round, count)
 
 #IMDB user
 imdb_user_count <- count(other_critics, IMDB_norm_round)
-imdb_user_tibble <- tibble(IMDB_norm_round = 5,
-                         n = 0)
-imdb_user_data <- full_join(count_imdb_user, imdb_user_tibble) 
-
+imdb_user_tibble <- tibble(IMDB_norm_round = seq(0,5, .5)) %>% 
+  full_join(imdb_user_count) %>% 
+  mutate(count = case_when(
+    is.na(n) ~ 0,
+    !is.na(n) ~ as.numeric(n)
+  )) %>% select(IMDB_norm_round, count) 
 
 ```
 
 ```{r}
-#Testing
+#Combined Plot
 fandango_count, rt_count, rt_user_count, mc_count, mc_user_count, imdb_user_count
 
 ```
