@@ -31,7 +31,7 @@ ratings <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/mast
 
 ```
 
-```{r warning = FALSE, echo = FALSE, include = FALSE}
+```{r warning = FALSE, include = FALSE}
 # Fandango
 fandango_count <- count(ratings, Fandango_Stars)
 fandango_data <- tibble(Fandango_Stars = seq(.5,5, .5)) %>% 
@@ -93,20 +93,45 @@ imdb_user_data <- tibble(IMDB_norm_round = seq(0.5, 5, .5)) %>%
   )) %>% mutate(rating = IMDB_norm_round) %>% 
   select(rating, count_imdbu) 
 
+
+
+```
+
+```{r warning = FALSE}
+fandango_data
+rt_data
+rt_user_data
+mc_data
+mc_user_data
+imdb_user_data
+```
+
+```{r warning = FALSE}
+# Final data set and plot
+df <-  merge(fandango_data, 
+             c(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) %>% 
+  select(rating, 
+         contains("_"))
+df
+
+```
+
+```{r echo = FALSE, warning = FALSE, fig.align='center', fig.height=5, fig.width=7}
+
 #Final Plot
-final_plot <- df %>% ggplot(aes(x = rating, y = count_fan)) +
+final_plot <- ggplot(data = df, aes(x = rating, y = count_fan)) +
   geom_line(color = "red") + 
   geom_text(aes(x = 5, y = 45, label = "Fandango"), color = "Tomato") +
   geom_line(aes(x = rating, y = count_rt), color = "#333333", ) + 
-  geom_text(aes(x = .5, y = 20, label = "Rotten Tomatoes"), color = "#333333") +
+  geom_text(aes(x = .5, y = 20, label = "Rotten\nTomatoes"), color = "#333333") +
   geom_line(aes(x = rating, y = count_rtu), color = "#3399FF") + 
-  geom_text(aes(x = 2.5, y = 30, label = "Rotten Tomatoes Users"), color = "#3399FF") +
+  geom_text(aes(x = 2.15, y = 30, label = "Rotten Tomatoes\nUsers"), color = "#3399FF") +
   geom_line(aes(x = rating, y = count_mc), color = "#990099") + 
   geom_text(aes(x = 1.5, y = 25, label = "Metacritic"), color = "#990099")+
   geom_line(aes(x = rating, y = count_mcu), color = "#009900") + 
-  geom_text(aes(x = 2.75, y = 40, label = "Metacritic Users"), color = "#009900") +
+  geom_text(aes(x = 2.75, y = 40, label = "Metacritic\nUsers"), color = "#009900") +
   geom_line(aes(x = rating, y = count_imdbu), color = "#CCCC00") + 
-  geom_text(aes(x = 3, y = 50, label = "IMDb Users"), color = "#CCCC00") +
+  geom_text(aes(x = 3, y = 57, label = "IMDb\nUsers"), color = "#CCCC00") +
   geom_area(fill =  "tomato", alpha = .5) +
   scale_x_continuous(limits = c(0,5.1), 
                      breaks = seq(0,5,1)) +
@@ -122,18 +147,7 @@ final_plot <- df %>% ggplot(aes(x = rating, y = count_fan)) +
   theme(plot.title = element_text(size = 20, face = 'bold', color = 'grey20')) +
   theme(plot.subtitle = element_text(size = 13, color = 'grey25'))
 
-```
-
-```{r warning = FALSE, fig.align='center', fig.height=5, fig.width=7}
-# Final dataset
-df <-  merge(fandango_data, c(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) %>% 
-  select(rating, contains("_"))
-df
-
-# Final Plot
 final_plot
-
-
 ```
 
 ### Conclusion
