@@ -10,7 +10,7 @@ editor: visual
 
 In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization.
 
-```{r}
+```{r warning = FALSE}
 pacman::p_load(
   tidyverse,
   fivethirtyeight,
@@ -23,7 +23,7 @@ pacman::p_load(
 
 ## Movie Data
 
-538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions.
+538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions. I have kept the code to a minimum on the final rendering, but if you wish to view the code please checkout the [GitHub repository here](https://github.com/nathanweldon/Web-extraction-demo).
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 # install.packages("fivethirtyeight")
@@ -31,7 +31,7 @@ ratings <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/mast
 
 ```
 
-```{r include = FALSE}
+```{r warning = FALSE, echo = FALSE, include = FALSE}
 # Fandango
 fandango_count <- count(ratings, Fandango_Stars)
 fandango_data <- tibble(Fandango_Stars = seq(.5,5, .5)) %>% 
@@ -93,27 +93,54 @@ imdb_user_data <- tibble(IMDB_norm_round = seq(0.5, 5, .5)) %>%
   )) %>% mutate(rating = IMDB_norm_round) %>% 
   select(rating, count_imdbu) 
 
+#Final Plot
+final_plot <- df %>% ggplot(aes(x = rating, y = count_fan)) +
+  geom_line(color = "red") + 
+  geom_text(aes(x = 5, y = 45, label = "Fandango"), color = "Tomato") +
+  geom_line(aes(x = rating, y = count_rt), color = "#333333", ) + 
+  geom_text(aes(x = .5, y = 20, label = "Rotten Tomatoes"), color = "#333333") +
+  geom_line(aes(x = rating, y = count_rtu), color = "#3399FF") + 
+  geom_text(aes(x = 2.5, y = 30, label = "Rotten Tomatoes Users"), color = "#3399FF") +
+  geom_line(aes(x = rating, y = count_mc), color = "#990099") + 
+  geom_text(aes(x = 1.5, y = 25, label = "Metacritic"), color = "#990099")+
+  geom_line(aes(x = rating, y = count_mcu), color = "#009900") + 
+  geom_text(aes(x = 2.75, y = 40, label = "Metacritic Users"), color = "#009900") +
+  geom_line(aes(x = rating, y = count_imdbu), color = "#CCCC00") + 
+  geom_text(aes(x = 3, y = 50, label = "IMDb Users"), color = "#CCCC00") +
+  geom_area(fill =  "tomato", alpha = .5) +
+  scale_x_continuous(limits = c(0,5.1), 
+                     breaks = seq(0,5,1)) +
+  scale_y_continuous(limits = c(0,90), 
+                     labels = scales::percent_format(scale = .5, 
+                                                     accuracy = 10)) +
+  labs(title = "Fandango LOVES Movies",
+       subtitle = "Normalized ratings distribution of 146 films that \nplayed in theaters in 2015 and received 30+ reviews on Fandango.com",
+       y = " ",
+       x = " ") +
+  theme(panel.background = element_rect(fill = '#F5F5F5')) +
+  theme(plot.background = element_rect(fill = '#F5F5F5')) +
+  theme(plot.title = element_text(size = 20, face = 'bold', color = 'grey20')) +
+  theme(plot.subtitle = element_text(size = 13, color = 'grey25'))
+
 ```
 
-```{r}
-# Combined dataset
+```{r warning = FALSE, fig.align='center', fig.height=5, fig.width=7}
+# Final dataset
 df <-  merge(fandango_data, c(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) %>% 
   select(rating, contains("_"))
 df
 
 # Final Plot
-df %>% ggplot(aes(x = rating, y = count_fan)) +
-  geom_line(color = "red") + # fandango
-  geom_area(color = 'red', alpha = .5) +
-  geom_line(aes(x = rating, y = count_rt, color = "black")) + # RT
-  geom_line(aes(x = rating, y = count_rtu, color = "blue")) + # RT Users
-  geom_line(aes(x = rating, y = count_mc, color = "purple")) + # MC
-  geom_line(aes(x = rating, y = count_mcu, color = "green")) + # MC Users
-  geom_line(aes(x = rating, y = count_rt, color = "yellow")) # IMDb Users
+final_plot
+
 
 ```
 
 ### Conclusion
+
+My method was to take the ratings data set to calculate all of the rounded ratings for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users, then plot them to demonstrate the major difference in the ratings for Fandango compared to the rest. I did this by reading in the data set as a .csv, finding the respective amount of votes for each rating, combining all of the sets of data of each critic, and changing missing values to 0. With the final data set and various aesthetics, I was able to produce this plot.
+
+The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate.
 
 ## HTML
 
