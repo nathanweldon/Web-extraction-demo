@@ -40,7 +40,7 @@ fandango <- rating %>%
   select(c(FILM, Fandango_Stars)) 
 
 fandango_count <- count(fandango, Fandango_Stars)
-fandango_data <- tibble(Fandango_Stars = seq(0,5, .5)) %>% 
+fandango_data <- tibble(Fandango_Stars = seq(.5,5, .5)) %>% 
   full_join(fandango_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -56,7 +56,7 @@ other_critics <- rating %>%
 
 #Rotten Tomatoes
 rt_count <- count(other_critics, RT_norm_round)
-rt_data <- tibble(RT_norm_round = seq(0,5, .5)) %>% 
+rt_data <- tibble(RT_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(rt_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -65,7 +65,7 @@ rt_data <- tibble(RT_norm_round = seq(0,5, .5)) %>%
 
 #RT User
 rt_user_count <- count(other_critics, RT_user_norm_round)
-rt_user_data <- tibble(RT_user_norm_round = seq(0,5, .5)) %>% 
+rt_user_data <- tibble(RT_user_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(rt_user_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -74,7 +74,7 @@ rt_user_data <- tibble(RT_user_norm_round = seq(0,5, .5)) %>%
 
 #Metacritic
 mc_count <- count(other_critics, Metacritic_norm_round)
-mc_data <- tibble(Metacritic_norm_round = seq(0,5, .5)) %>% 
+mc_data <- tibble(Metacritic_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(mc_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -83,7 +83,7 @@ mc_data <- tibble(Metacritic_norm_round = seq(0,5, .5)) %>%
 
 #MC User
 mc_user_count <- count(other_critics, Metacritic_user_norm_round)
-mc_user_data <- tibble(Metacritic_user_norm_round = seq(0,5, .5)) %>% 
+mc_user_data <- tibble(Metacritic_user_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(mc_user_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -92,7 +92,7 @@ mc_user_data <- tibble(Metacritic_user_norm_round = seq(0,5, .5)) %>%
 
 #IMDB user
 imdb_user_count <- count(other_critics, IMDB_norm_round)
-imdb_user_tibble <- tibble(IMDB_norm_round = seq(0,5, .5)) %>% 
+imdb_user_data <- tibble(IMDB_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(imdb_user_count) %>% 
   mutate(count = case_when(
     is.na(n) ~ 0,
@@ -103,7 +103,7 @@ imdb_user_tibble <- tibble(IMDB_norm_round = seq(0,5, .5)) %>%
 
 ```{r}
 #Combined Plot
-fandango_count, rt_count, rt_user_count, mc_count, mc_user_count, imdb_user_count
+
 
 ```
 
