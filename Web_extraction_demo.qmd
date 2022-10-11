@@ -27,83 +27,89 @@ pacman::p_load(
 
 ```{r warning = FALSE, echo = FALSE, include = FALSE}
 # install.packages("fivethirtyeight")
-rating <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
+ratings <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
 
 ```
 
 ```{r include = FALSE}
-#Finding Fandango Stars
-fandango <- rating %>%
-  drop_na() %>% 
-  filter(Fandango_votes > 30) %>% 
-  filter(FILM %>% str_detect('2015')) %>% 
-  select(c(FILM, Fandango_Stars)) 
-
-fandango_count <- count(fandango, Fandango_Stars)
+# Fandango
+fandango_count <- count(ratings, Fandango_Stars)
 fandango_data <- tibble(Fandango_Stars = seq(.5,5, .5)) %>% 
   full_join(fandango_count) %>% 
-  mutate(count = case_when(
+  mutate(count_fan = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(Fandango_Stars, count)
-
-#Finding Other Stars
-other_critics <- rating %>% 
-  drop_na() %>% 
-  filter(Fandango_votes > 30) %>% 
-  filter(FILM %>% str_detect('2015')) %>% 
-  select(c(FILM, contains("round")))
+  )) %>% 
+  mutate(rating = Fandango_Stars) %>% 
+  select(rating, count_fan)
 
 #Rotten Tomatoes
-rt_count <- count(other_critics, RT_norm_round)
+rt_count <- count(ratings, RT_norm_round)
 rt_data <- tibble(RT_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(rt_count) %>% 
-  mutate(count = case_when(
+  mutate(count_rt = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(RT_norm_round, count)
+  )) %>% mutate(rating = RT_norm_round) %>% 
+  select(rating, count_rt)
 
 #RT User
-rt_user_count <- count(other_critics, RT_user_norm_round)
+rt_user_count <- count(ratings, RT_user_norm_round)
 rt_user_data <- tibble(RT_user_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(rt_user_count) %>% 
-  mutate(count = case_when(
+  mutate(count_rtu = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(RT_user_norm_round, count)
+  )) %>% mutate(rating = RT_user_norm_round) %>% 
+  select(rating, count_rtu)
 
 #Metacritic
-mc_count <- count(other_critics, Metacritic_norm_round)
+mc_count <- count(ratings, Metacritic_norm_round)
 mc_data <- tibble(Metacritic_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(mc_count) %>% 
-  mutate(count = case_when(
+  mutate(count_mc = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(Metacritic_norm_round, count)
+  )) %>% mutate(rating = Metacritic_norm_round) %>% 
+  select(rating, count_mc)
 
 #MC User
-mc_user_count <- count(other_critics, Metacritic_user_norm_round)
+mc_user_count <- count(ratings, Metacritic_user_norm_round)
 mc_user_data <- tibble(Metacritic_user_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(mc_user_count) %>% 
-  mutate(count = case_when(
+  mutate(count_mcu = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(Metacritic_user_norm_round, count)
+  )) %>% mutate(rating = Metacritic_user_norm_round) %>% 
+  select(rating, count_mcu)
 
 #IMDB user
-imdb_user_count <- count(other_critics, IMDB_norm_round)
+imdb_user_count <- count(ratings, IMDB_norm_round)
 imdb_user_data <- tibble(IMDB_norm_round = seq(0.5, 5, .5)) %>% 
   full_join(imdb_user_count) %>% 
-  mutate(count = case_when(
+  mutate(count_imdbu = case_when(
     is.na(n) ~ 0,
     !is.na(n) ~ as.numeric(n)
-  )) %>% select(IMDB_norm_round, count) 
+  )) %>% mutate(rating = IMDB_norm_round) %>% 
+  select(rating, count_imdbu) 
 
 ```
 
 ```{r}
-#Combined Plot
+# Combined dataset
+df <-  merge(fandango_data, c(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) %>% 
+  select(rating, contains("_"))
+df
 
+# Final Plot
+df %>% ggplot(aes(x = rating, y = count_fan)) +
+  geom_line(color = "red") + # fandango
+  geom_area(color = 'red', alpha = .5) +
+  geom_line(aes(x = rating, y = count_rt, color = "black")) + # RT
+  geom_line(aes(x = rating, y = count_rtu, color = "blue")) + # RT Users
+  geom_line(aes(x = rating, y = count_mc, color = "purple")) + # MC
+  geom_line(aes(x = rating, y = count_mcu, color = "green")) + # MC Users
+  geom_line(aes(x = rating, y = count_rt, color = "yellow")) # IMDb Users
 
 ```
 
