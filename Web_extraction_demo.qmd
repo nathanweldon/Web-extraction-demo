@@ -162,6 +162,54 @@ Some issues I ran into was finding a way to put the gray fill color underneath a
 
 IGNORE THIS PART - TO COME
 
-```{r}
+```{r warning = FALSE}
+education <- read_html('https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States') %>%
+  html_elements('table.sortable') %>%
+  html_table()
+```
 
+```{r warning = FALSE, include = FALSE}
+tmp <- education[[2]] %>%
+  drop_na() %>%
+  clean_names() %>%
+  pivot_longer(!year, names_to = 'Age', values_to ='Median_income') %>%
+  mutate(Median_income = str_sub(Median_income, start = 2)) %>%
+  filter(Median_income %>% str_detect(",")) %>%
+  slice(-c(159:176)) 
+
+age <- tmp$Age %>%
+  str_replace_all('_',' ') %>%
+  str_to_title() %>%
+  fct_relevel(c("Less Than 9th Grade",
+                "High School Drop Out",
+                "High School Graduate",
+                "Some College",
+                "Associate Degree",
+                "Bachelors Degree",
+                "Bachelors Degree Or More",
+                "Masters Degree",
+                "Doctorate Degree",
+                "Professional Degree",
+                "Overall Median"))
+
+med_income <- tmp$Median_income %>%
+  str_remove(',') %>%
+  as.numeric(tmp$Median_income)
+
+
+```
+
+```{r warning = FALSE, fig.width = 7, fig.height = 5}
+df <- tmp %>%
+  mutate(Level = age) %>%
+  mutate(Income = med_income) %>%
+  select(1,4,5)
+df
+
+ggplot(data = df, aes(year, med_income, color = Level, group = Level)) +
+  geom_line() +
+  labs(x = 'Year',
+       y = 'Median Income') +
+  scale_y_continuous(limits = c(20000,160000)) +
+  theme_bw()
 ```
