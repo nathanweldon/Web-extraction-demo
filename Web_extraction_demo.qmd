@@ -8,7 +8,7 @@ editor: visual
 
 ## Introduction
 
-In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization.
+In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization. I have kept the code to a minimum on the final rendering, but if you wish to view the code please checkout the [GitHub repository here](https://github.com/nathanweldon/Web-extraction-demo).
 
 ```{r warning = FALSE}
 pacman::p_load(
@@ -23,11 +23,11 @@ pacman::p_load(
 
 ## Movie Data
 
-538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions. I have kept the code to a minimum on the final rendering, but if you wish to view the code please checkout the [GitHub repository here](https://github.com/nathanweldon/Web-extraction-demo).
+538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article [linked here](https://fivethirtyeight.com/features/fandango-movies-ratings/) about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions. Here I will read in the data and preview the data set:
 
-```{r warning = FALSE, echo = FALSE, include = FALSE}
-# install.packages("fivethirtyeight")
+```{r warning = FALSE}
 ratings <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv') 
+tibble(ratings)
 
 ```
 
@@ -97,6 +97,8 @@ imdb_user_data <- tibble(IMDB_norm_round = seq(0.5, 5, .5)) %>%
 
 ```
 
+After some cleaning and manipulation, here are the data frames for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users:
+
 ```{r warning = FALSE}
 fandango_data
 rt_data
@@ -105,6 +107,8 @@ mc_data
 mc_user_data
 imdb_user_data
 ```
+
+Here is the final, combined data set:
 
 ```{r warning = FALSE}
 # Final data set and plot
@@ -115,6 +119,8 @@ df <-  merge(fandango_data,
 df
 
 ```
+
+Lastly, I will plot the graph to mimic the graph on the site, using the final data set:
 
 ```{r echo = FALSE, warning = FALSE, fig.align='center', fig.height=5, fig.width=7}
 
@@ -152,9 +158,7 @@ final_plot
 
 ### Conclusions
 
-My method was to take the ratings data set to calculate all of the rounded ratings for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users, then plot them to demonstrate the major difference in the ratings for Fandango compared to the rest. I did this by reading in the data set as a .csv, finding the respective amount of votes for each rating, combining all of the sets of data of each critic, and changing missing values to 0. With the final data set and various aesthetics, I was able to produce this plot.
-
-The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate.
+The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate. A way I could see if Fandango has a history of over rating movies is to take more ratings from past years, graph them individually similar to this one, and see if there is a general correlation or if 2015 just had really good movies.
 
 Some issues I ran into was finding a way to put the gray fill color underneath all of the lines, as I could only maneuver my way to get one using geom_area(). Also, I could not find a package containing aesthetics for stars for the x axis: the graph on the page contains stars on the bottom of the graph but I did not find any in my research. Fortunately, my greatest issues were primarily in the aesthetics department and not so much in the technical area.
 

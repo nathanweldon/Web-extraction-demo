@@ -133,7 +133,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization.</p>
+<p>In this project, I will work with online sources to recreate already produced data as a challenge. I will demonstrate my ability in data extraction, cleaning, and visualization. I have kept the code to a minimum on the final rendering, but if you wish to view the code please checkout the <a href="https://github.com/nathanweldon/Web-extraction-demo">GitHub repository here</a>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  tidyverse,</span>
@@ -146,9 +146,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="movie-data" class="level2">
 <h2 class="anchored" data-anchor-id="movie-data">Movie Data</h2>
-<p>538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/">linked here</a> about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions. I have kept the code to a minimum on the final rendering, but if you wish to view the code please checkout the <a href="https://github.com/nathanweldon/Web-extraction-demo">GitHub repository here</a>.</p>
+<p>538 is a website that focuses on opinion poll analysis, politics, economics, and sports blogging. It was created and is currently run by Nate Silver, who has become famous for his writing and work on the site. I found this interesting article <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/">linked here</a> about how fandango has skewed ratings for a variety of reasons, when rating movies. Below is the recreation of the plot containing all of the critics and their ratings, along with more conclusions. Here I will read in the data and preview the data set:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fandango_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv'</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(ratings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 146 × 22
+   FILM    Rotte…¹ Rotte…² Metac…³ Metac…⁴  IMDB Fanda…⁵ Fanda…⁶ RT_norm RT_us…⁷
+   &lt;chr&gt;     &lt;int&gt;   &lt;int&gt;   &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 Avenge…      74      86      66     7.1   7.8     5       4.5    3.7     4.3 
+ 2 Cinder…      85      80      67     7.5   7.1     5       4.5    4.25    4   
+ 3 Ant-Ma…      80      90      64     8.1   7.8     5       4.5    4       4.5 
+ 4 Do You…      18      84      22     4.7   5.4     5       4.5    0.9     4.2 
+ 5 Hot Tu…      14      28      29     3.4   5.1     3.5     3      0.7     1.4 
+ 6 The Wa…      63      62      50     6.8   7.2     4.5     4      3.15    3.1 
+ 7 Irrati…      42      53      53     7.6   6.9     4       3.5    2.1     2.65
+ 8 Top Fi…      86      64      81     6.8   6.5     4       3.5    4.3     3.2 
+ 9 Shaun …      99      82      81     8.8   7.4     4.5     4      4.95    4.1 
+10 Love &amp;…      89      87      80     8.5   7.8     4.5     4      4.45    4.35
+# … with 136 more rows, 12 more variables: Metacritic_norm &lt;dbl&gt;,
+#   Metacritic_user_nom &lt;dbl&gt;, IMDB_norm &lt;dbl&gt;, RT_norm_round &lt;dbl&gt;,
+#   RT_user_norm_round &lt;dbl&gt;, Metacritic_norm_round &lt;dbl&gt;,
+#   Metacritic_user_norm_round &lt;dbl&gt;, IMDB_norm_round &lt;dbl&gt;,
+#   Metacritic_user_vote_count &lt;int&gt;, IMDB_user_vote_count &lt;int&gt;,
+#   Fandango_votes &lt;int&gt;, Fandango_Difference &lt;dbl&gt;, and abbreviated variable
+#   names ¹​RottenTomatoes, ²​RottenTomatoes_User, ³​Metacritic, …</code></pre>
+</div>
+</div>
+<p>After some cleaning and manipulation, here are the data frames for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fandango_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_fan
@@ -164,7 +191,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  9    4.5        55
 10    5          11</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rt_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rt_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_rt
@@ -180,7 +207,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  9    4.5       23
 10    5         23</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rt_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rt_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_rtu
@@ -196,7 +223,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  9    4.5        27
 10    5           0</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mc_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mc_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_mc
@@ -212,7 +239,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  9    4.5       15
 10    5          0</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mc_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mc_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_mcu
@@ -228,7 +255,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  9    4.5         9
 10    5           1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>imdb_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>imdb_user_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    rating count_imdbu
@@ -245,13 +272,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 10    5             0</code></pre>
 </div>
 </div>
+<p>Here is the final, combined data set:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Final data set and plot</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span>  <span class="fu">merge</span>(fandango_data, </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">c</span>(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rating, </span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="st">"_"</span>))</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Final data set and plot</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span>  <span class="fu">merge</span>(fandango_data, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">c</span>(rt_data, rt_user_data, mc_data, mc_user_data,imdb_user_data)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(rating, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="st">"_"</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   rating count_fan count_rt count_rtu count_mc count_mcu count_imdbu
 1     0.5         0       14         0        1         0           0
@@ -266,6 +294,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 10    5.0        11       23         0        0         1           0</code></pre>
 </div>
 </div>
+<p>Lastly, I will plot the graph to mimic the graph on the site, using the final data set:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -277,8 +306,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <section id="conclusions" class="level3">
 <h3 class="anchored" data-anchor-id="conclusions">Conclusions</h3>
-<p>My method was to take the ratings data set to calculate all of the rounded ratings for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users, then plot them to demonstrate the major difference in the ratings for Fandango compared to the rest. I did this by reading in the data set as a .csv, finding the respective amount of votes for each rating, combining all of the sets of data of each critic, and changing missing values to 0. With the final data set and various aesthetics, I was able to produce this plot.</p>
-<p>The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate.</p>
+<p>The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate. A way I could see if Fandango has a history of over rating movies is to take more ratings from past years, graph them individually similar to this one, and see if there is a general correlation or if 2015 just had really good movies.</p>
 <p>Some issues I ran into was finding a way to put the gray fill color underneath all of the lines, as I could only maneuver my way to get one using geom_area(). Also, I could not find a package containing aesthetics for stars for the x axis: the graph on the page contains stars on the bottom of the graph but I did not find any in my research. Fortunately, my greatest issues were primarily in the aesthetics department and not so much in the technical area.</p>
 </section>
 </section>
@@ -286,10 +314,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="html">HTML</h2>
 <p>In this section, I will create a similar graph from Wikipedia by using html extraction code to find the data within the html format. The article touches on educational attainment within the United States, <a href="https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States">found here</a>. It includes several excellent graphs and charts representing different types of data involving education levels, institutional racism and gender bias, for instance. In particular, selected to find the correlation between median income and degree graduated as time progresses. Here is the original data set:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>education <span class="ot">&lt;-</span> <span class="fu">read_html</span>(<span class="st">'https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_elements</span>(<span class="st">'table.sortable'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>()</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>education <span class="ot">&lt;-</span> <span class="fu">read_html</span>(<span class="st">'https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_elements</span>(<span class="st">'table.sortable'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>()</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 # A tibble: 3 × 12
@@ -370,12 +398,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>Here is the final graph:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(year, med_income, <span class="at">color =</span> Level, <span class="at">group =</span> Level)) <span class="sc">+</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">'Year'</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Median Income'</span>) <span class="sc">+</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">20000</span>,<span class="dv">160000</span>), <span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(year, med_income, <span class="at">color =</span> Level, <span class="at">group =</span> Level)) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">'Year'</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Median Income'</span>) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">20000</span>,<span class="dv">160000</span>), <span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Web_extraction_demo_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="864"></p>
 </div>
