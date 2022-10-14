@@ -2,7 +2,7 @@
 title: "Web Extraction"
 format: html
 author: "Nathan Weldon"
-date: as.date()
+date: 10-14-2022
 editor: visual
 ---
 
@@ -150,7 +150,7 @@ final_plot <- ggplot(data = df, aes(x = rating, y = count_fan)) +
 final_plot
 ```
 
-### Conclusion
+### Conclusions
 
 My method was to take the ratings data set to calculate all of the rounded ratings for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users, then plot them to demonstrate the major difference in the ratings for Fandango compared to the rest. I did this by reading in the data set as a .csv, finding the respective amount of votes for each rating, combining all of the sets of data of each critic, and changing missing values to 0. With the final data set and various aesthetics, I was able to produce this plot.
 
@@ -160,12 +160,13 @@ Some issues I ran into was finding a way to put the gray fill color underneath a
 
 ## HTML
 
-IGNORE THIS PART - TO COME
+In this section, I will create a similar graph from Wikipedia by using html extraction code to find the data within the html format. The article touches on educational attainment within the United States, [found here](https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States). It includes several excellent graphs and charts representing different types of data involving education levels, institutional racism and gender bias, for instance. In particular, selected to find the correlation between median income and degree graduated as time progresses. Here is the original data set:
 
 ```{r warning = FALSE}
 education <- read_html('https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States') %>%
   html_elements('table.sortable') %>%
   html_table()
+education
 ```
 
 ```{r warning = FALSE, include = FALSE}
@@ -199,17 +200,30 @@ med_income <- tmp$Median_income %>%
 
 ```
 
-```{r warning = FALSE, fig.width = 7, fig.height = 5}
+As you can see, this is lengthy and fairly messy due to different characters (\$ and ,). I was able to manipulate this data set and transform it into three different columns that are useful to the graph I am choosing to create:
+
+```{r warning = FALSE, echo = FALSE}
 df <- tmp %>%
   mutate(Level = age) %>%
   mutate(Income = med_income) %>%
   select(1,4,5)
 df
 
+```
+
+Here is the final graph:
+
+```{r warning = FALSE, fig.width = 9, fig.height = 5}
 ggplot(data = df, aes(year, med_income, color = Level, group = Level)) +
   geom_line() +
   labs(x = 'Year',
        y = 'Median Income') +
-  scale_y_continuous(limits = c(20000,160000)) +
+  scale_y_continuous(limits = c(20000,160000), labels=scales::dollar_format()) +
   theme_bw()
 ```
+
+### Conclusions
+
+This graph does well to show that the higher level of degree one achieves, the higher the income will be, on average. The phrase, "on average," is key in this analysis because around the years 1999 and 2015, doctorate degrees generally had a higher median income than the professional degrees, which is the opposite for the rest of the given time period, for one example. One interesting allusion that I noticed was that the general trend of each line decreases around 2009-2011, most likely due to the recession that took place around 2008.
+
+A problem I ran into were sorting the legend of the graph: the titles of each of the lines go in descending order from how they appear on the graph. This is not a massive issue, but it would improve my graph even more.

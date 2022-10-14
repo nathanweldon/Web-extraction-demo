@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nathan Weldon">
+<meta name="dcterms.date" content="2022-10-14">
 
 <title>Web Extraction</title>
 <style>
@@ -121,7 +122,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">Invalid Date</p>
+      <p class="date">October 14, 2022</p>
     </div>
   </div>
     
@@ -274,8 +275,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<section id="conclusion" class="level3">
-<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<section id="conclusions" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions">Conclusions</h3>
 <p>My method was to take the ratings data set to calculate all of the rounded ratings for Fandango, Rotten Tomatoes, Rotten Tomatoes users, Metacritic, Metacritic users, and IMDb users, then plot them to demonstrate the major difference in the ratings for Fandango compared to the rest. I did this by reading in the data set as a .csv, finding the respective amount of votes for each rating, combining all of the sets of data of each critic, and changing missing values to 0. With the final data set and various aesthetics, I was able to produce this plot.</p>
 <p>The original article goes into detail regarding the statistics and theories behind this data, but simply by observing the plot, there is an obvious trend of Fandango having higher ratings than the rest. There is not much more interpretation from this plot, but it was good practice to be able to recreate.</p>
 <p>Some issues I ran into was finding a way to put the gray fill color underneath all of the lines, as I could only maneuver my way to get one using geom_area(). Also, I could not find a package containing aesthetics for stars for the x axis: the graph on the page contains stars on the bottom of the graph but I did not find any in my research. Fortunately, my greatest issues were primarily in the aesthetics department and not so much in the technical area.</p>
@@ -283,10 +284,107 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="html" class="level2">
 <h2 class="anchored" data-anchor-id="html">HTML</h2>
-<p>IGNORE THIS PART - TO COME</p>
+<p>In this section, I will create a similar graph from Wikipedia by using html extraction code to find the data within the html format. The article touches on educational attainment within the United States, <a href="https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States">found here</a>. It includes several excellent graphs and charts representing different types of data involving education levels, institutional racism and gender bias, for instance. In particular, selected to find the correlation between median income and degree graduated as time progresses. Here is the original data set:</p>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>education <span class="ot">&lt;-</span> <span class="fu">read_html</span>(<span class="st">'https://en.wikipedia.org/wiki/Educational_attainment_in_the_United_States'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_elements</span>(<span class="st">'table.sortable'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+# A tibble: 3 × 12
+  Criteria       Crite…¹ Overall Less …² High …³ High …⁴ Some …⁵ Assoc…⁶ Bache…⁷
+  &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+1 Median indivi… Male, … $51,297 $30,018 $30,065 $40,901 $46,851 $51,734 $67,399
+2 Median indivi… Female… $37,137 $19,802 $19,612 $27,203 $31,136 $34,951 $49,011
+3 Median househ… Median… $45,016 $18,787 $22,718 $36,835 $45,854 $51,970 $68,728
+# … with 3 more variables: `Master's degree` &lt;chr&gt;,
+#   `Professional degree` &lt;chr&gt;, `Doctorate degree` &lt;chr&gt;, and abbreviated
+#   variable names ¹​Criteria, ²​`Less than 9th grade`, ³​`High school drop-out`,
+#   ⁴​`High school graduate`, ⁵​`Some college`, ⁶​`Associate degree`,
+#   ⁷​`Bachelor's degree`
 
+[[2]]
+# A tibble: 16 × 12
+   Year  Overa…¹ Less …² High …³ High …⁴ Some …⁵ Assoc…⁶ Bache…⁷ Bache…⁸ Maste…⁹
+   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 1991  $56,965 $24,270 $32,189 $52,293 $64,525 $72,877 $89,407 $95,952 $101,2…
+ 2 1993  $56,197 $24,320 $31,388 $50,142 $61,533 $69,155 $89,941 $98,040 $105,4…
+ 3 1995  $58,881 $25,138 $30,578 $52,433 $62,092 $70,385 $88,330 $97,011 $108,5…
+ 4 1997  $60,849 $24,762 $31,629 $53,821 $63,756 $72,110 $94,082 $100,8… $108,5…
+ 5 1999  $64,474 $26,506 $33,436 $54,833 $67,755 $75,694 $98,901 $107,3… $114,4…
+ 6 2001  $63,100 $26,229 $33,656 $52,190 $66,311 $74,058 $97,223 $104,6… $114,2…
+ 7 2003  $62,726 $26,178 $31,656 $51,326 $63,894 $72,416 $95,766 $102,3… $109,4…
+ 8 2005  $62,618 $26,540 $32,381 $50,118 $63,363 $71,795 $95,042 $101,2… $106,3…
+ 9 2007  $63,566 $25,716 $30,273 $50,006 $62,320 $74,326 $95,923 $104,4… $112,0…
+10 2009  $60,884 $25,843 $30,583 $47,358 $57,828 $67,833 $90,205 $98,810 $109,4…
+11 2011  $58,376 $24,860 $28,132 $44,907 $54,093 $63,712 $89,142 $95,674 $103,6…
+12 2013  $58,515 $26,596 $28,220 $44,741 $54,615 $61,762 $87,416 $94,989 $105,4…
+13 2015  $62,636 $28,329 $28,441 $45,373 $56,012 $67,428 $94,952 $102,4… $109,3…
+14 2017  $65,314 $27,729 $31,392 $46,901 $57,949 $67,022 $95,712 $104,3… $112,8…
+15 2019  $70,308 $30,355 $31,326 $48,708 $61,911 $69,573 $100,1… $108,6… $117,4…
+16 Aver… $61,694 $26,225 $31,019 $49,677 $61,197 $70,010 $93,480 $101,1… $109,2…
+# … with 2 more variables: `Professional degree` &lt;chr&gt;,
+#   `Doctorate degree` &lt;chr&gt;, and abbreviated variable names ¹​`Overall Median`,
+#   ²​`Less than 9th grade`, ³​`High school drop-out`, ⁴​`High school graduate`,
+#   ⁵​`Some college`, ⁶​`Associate degree`, ⁷​`Bachelor's degree`,
+#   ⁸​`Bachelor's degree or more`, ⁹​`Master's degree`
+
+[[3]]
+# A tibble: 31 × 5
+   Group                            % with college deg…¹ % wit…² % wit…³ % wit…⁴
+   &lt;chr&gt;                                           &lt;int&gt;   &lt;int&gt;   &lt;int&gt;   &lt;int&gt;
+ 1 Hindu                                              77      11      10       2
+ 2 Unitarian Universalist                             67      23       9       1
+ 3 Jewish                                             59      22      16       3
+ 4 Anglican                                           59      32       8       1
+ 5 Episcopal Church (United States)                   56      28      14       2
+ 6 Presbyterian Church (USA)                          47      25      24       3
+ 7 Buddhist                                           47      33      18       2
+ 8 United Church of Christ                            46      21      26       7
+ 9 Atheist                                            43      31      22       4
+10 Agnostic                                           42      36      21       1
+# … with 21 more rows, and abbreviated variable names ¹​`% with college degree`,
+#   ²​`% with some college`, ³​`% with high school diploma`,
+#   ⁴​`% with less than high school diploma`</code></pre>
 </div>
+</div>
+<p>As you can see, this is lengthy and fairly messy due to different characters ($ and ,). I was able to manipulate this data set and transform it into three different columns that are useful to the graph I am choosing to create:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 158 × 3
+   year  Level                    Income
+   &lt;chr&gt; &lt;fct&gt;                     &lt;dbl&gt;
+ 1 1991  Overall Median            56965
+ 2 1991  Less Than 9th Grade       24270
+ 3 1991  High School Drop Out      32189
+ 4 1991  High School Graduate      52293
+ 5 1991  Some College              64525
+ 6 1991  Associate Degree          72877
+ 7 1991  Bachelors Degree          89407
+ 8 1991  Bachelors Degree Or More  95952
+ 9 1991  Masters Degree           101281
+10 1991  Professional Degree      143090
+# … with 148 more rows</code></pre>
+</div>
+</div>
+<p>Here is the final graph:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> df, <span class="fu">aes</span>(year, med_income, <span class="at">color =</span> Level, <span class="at">group =</span> Level)) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">'Year'</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">'Median Income'</span>) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">20000</span>,<span class="dv">160000</span>), <span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Web_extraction_demo_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="864"></p>
+</div>
+</div>
+<section id="conclusions-1" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions-1">Conclusions</h3>
+<p>This graph does well to show that the higher level of degree one achieves, the higher the income will be, on average. The phrase, “on average,” is key in this analysis because around the years 1999 and 2015, doctorate degrees generally had a higher median income than the professional degrees, which is the opposite for the rest of the given time period, for one example. One interesting allusion that I noticed was that the general trend of each line decreases around 2009-2011, most likely due to the recession that took place around 2008.</p>
+<p>A problem I ran into were sorting the legend of the graph: the titles of each of the lines go in descending order from how they appear on the graph. This is not a massive issue, but it would improve my graph even more.</p>
+</section>
 </section>
 
 </main>
